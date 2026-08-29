@@ -1,5 +1,8 @@
 package com.shopspace.backend.service;
 
+import com.shopspace.backend.dto.CategoryResponse;
+import com.shopspace.backend.dto.ProductResponse;
+import com.shopspace.backend.dto.SellerResponse;
 import com.shopspace.backend.entity.Product;
 import com.shopspace.backend.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -16,19 +19,50 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
+    public List<ProductResponse> getAllProducts() {
+
+        return productRepository.findAll()
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
+    }
+
+    public Optional<ProductResponse> getProductById(Long id) {
+
+        return productRepository.findById(id)
+                .map(this::convertToResponse);
+    }
+
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
-    }
+    private ProductResponse convertToResponse(Product product) {
 
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
-    }
+        CategoryResponse category = new CategoryResponse(
+                product.getCategory().getId(),
+                product.getCategory().getName(),
+                product.getCategory().getDescription(),
+                product.getCategory().isActive()
+        );
 
-    public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        SellerResponse seller = new SellerResponse(
+                product.getSeller().getId(),
+                product.getSeller().getFirstName()
+                        + " "
+                        + product.getSeller().getLastName()
+        );
+
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getSku(),
+                product.getImageUrl(),
+                product.isActive(),
+                category,
+                seller
+        );
     }
 }

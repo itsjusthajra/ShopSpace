@@ -1,5 +1,6 @@
 package com.shopspace.backend.controller;
 
+import com.shopspace.backend.dto.CategoryResponse;
 import com.shopspace.backend.entity.Category;
 import com.shopspace.backend.service.CategoryService;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +19,27 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        Category savedCategory = categoryService.createCategory(category);
+    public ResponseEntity<Category> createCategory(
+            @RequestBody Category category) {
+
+        Category savedCategory =
+                categoryService.createCategory(category);
+
         return ResponseEntity.ok(savedCategory);
     }
 
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+
+        return ResponseEntity.ok(
+                categoryService.getAllCategories()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<CategoryResponse> getCategoryById(
+            @PathVariable Long id) {
+
         return categoryService.getCategoryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

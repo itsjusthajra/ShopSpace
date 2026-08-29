@@ -1,5 +1,6 @@
 package com.shopspace.backend.controller;
 
+import com.shopspace.backend.dto.ProductResponse;
 import com.shopspace.backend.entity.Product;
 import com.shopspace.backend.service.ProductService;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,16 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+
+        return ResponseEntity.ok(
+                productService.getAllProducts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(
+            @PathVariable Long id) {
+
         return productService.getProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -31,7 +36,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-    Product savedProduct = productService.createProduct(product);
-    return ResponseEntity.ok(savedProduct);
-}
+        Product savedProduct = productService.createProduct(product);
+        return ResponseEntity.ok(savedProduct);
+    }
 }

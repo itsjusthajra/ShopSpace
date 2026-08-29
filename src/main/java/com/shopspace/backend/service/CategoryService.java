@@ -1,5 +1,6 @@
 package com.shopspace.backend.service;
 
+import com.shopspace.backend.dto.CategoryResponse;
 import com.shopspace.backend.entity.Category;
 import com.shopspace.backend.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -20,15 +21,31 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<CategoryResponse> getAllCategories() {
+
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
     }
 
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
+    public Optional<CategoryResponse> getCategoryById(Long id) {
+
+        return categoryRepository.findById(id)
+                .map(this::convertToResponse);
     }
 
     public void deleteCategory(Long id) {
         categoryRepository.deleteById(id);
+    }
+
+    private CategoryResponse convertToResponse(Category category) {
+
+        return new CategoryResponse(
+                category.getId(),
+                category.getName(),
+                category.getDescription(),
+                category.isActive()
+        );
     }
 }
