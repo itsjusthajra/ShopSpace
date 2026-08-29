@@ -1,5 +1,7 @@
 package com.shopspace.backend.controller;
 
+import com.shopspace.backend.dto.RegisterRequest;
+import com.shopspace.backend.dto.UserResponse;
 import com.shopspace.backend.entity.User;
 import com.shopspace.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +19,14 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userService.createUser(user);
-        return ResponseEntity.ok(savedUser);
-    }
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(
+        @RequestBody RegisterRequest request) {
+
+    UserResponse response = userService.register(request);
+
+    return ResponseEntity.ok(response);
+}
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
