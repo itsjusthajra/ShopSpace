@@ -1,10 +1,15 @@
 package com.shopspace.backend.service;
 
 import com.shopspace.backend.dto.CategoryResponse;
+import com.shopspace.backend.dto.CreateProductRequest;
 import com.shopspace.backend.dto.ProductResponse;
 import com.shopspace.backend.dto.SellerResponse;
+import com.shopspace.backend.entity.Category;
 import com.shopspace.backend.entity.Product;
+import com.shopspace.backend.entity.User;
+import com.shopspace.backend.repository.CategoryRepository;
 import com.shopspace.backend.repository.ProductRepository;
+import com.shopspace.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +19,17 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(
+            ProductRepository productRepository,
+            CategoryRepository categoryRepository,
+            UserRepository userRepository) {
+
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     public List<ProductResponse> getAllProducts() {
@@ -33,8 +46,28 @@ public class ProductService {
                 .map(this::convertToResponse);
     }
 
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public ProductResponse createProduct(CreateProductRequest request) {
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        User seller = userRepository.findById(request.getSellerId())
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        Product product = new Product();
+
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setSku(request.getSku());
+        product.setImageUrl(request.getImageUrl());
+        product.setCategory(category);
+        product.setSeller(seller);
+        product.setActive(true);
+
+        Product savedProduct = productRepository.save(product);
+
+        return convertToResponse(savedProduct);
     }
 
     private ProductResponse convertToResponse(Product product) {
@@ -43,15 +76,13 @@ public class ProductService {
                 product.getCategory().getId(),
                 product.getCategory().getName(),
                 product.getCategory().getDescription(),
-                product.getCategory().isActive()
-        );
+                product.getCategory().isActive());
 
         SellerResponse seller = new SellerResponse(
                 product.getSeller().getId(),
                 product.getSeller().getFirstName()
                         + " "
-                        + product.getSeller().getLastName()
-        );
+                        + product.getSeller().getLastName());
 
         return new ProductResponse(
                 product.getId(),
@@ -62,7 +93,6 @@ public class ProductService {
                 product.getImageUrl(),
                 product.isActive(),
                 category,
-                seller
-        );
+                seller);
     }
 }

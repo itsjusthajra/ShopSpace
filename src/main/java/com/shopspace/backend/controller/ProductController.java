@@ -1,7 +1,8 @@
 package com.shopspace.backend.controller;
 
+import com.shopspace.backend.dto.CreateProductRequest;
 import com.shopspace.backend.dto.ProductResponse;
-import com.shopspace.backend.entity.Product;
+
 import com.shopspace.backend.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +36,10 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product savedProduct = productService.createProduct(product);
-        return ResponseEntity.ok(savedProduct);
+    public ResponseEntity<ProductResponse> createProduct(
+            @RequestBody CreateProductRequest request) {
+
+        return ResponseEntity.ok(
+                productService.createProduct(request));
     }
 }
