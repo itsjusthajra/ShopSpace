@@ -4,6 +4,7 @@ import com.shopspace.backend.dto.CategoryResponse;
 import com.shopspace.backend.dto.CreateProductRequest;
 import com.shopspace.backend.dto.ProductResponse;
 import com.shopspace.backend.dto.SellerResponse;
+import com.shopspace.backend.dto.UpdateProductRequest;
 import com.shopspace.backend.entity.Category;
 import com.shopspace.backend.entity.Product;
 import com.shopspace.backend.entity.User;
@@ -12,6 +13,8 @@ import com.shopspace.backend.repository.ProductRepository;
 import com.shopspace.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,10 +55,12 @@ public class ProductService {
             Authentication authentication) {
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Category not found"));
 
         User seller = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "User not found"));
 
         Product product = new Product();
 
@@ -73,7 +78,61 @@ public class ProductService {
         return convertToResponse(savedProduct);
     }
 
-    private ProductResponse convertToResponse(Product product) {
+    public Product updateProduct(
+            Long productId,
+            UpdateProductRequest request,
+            Authentication authentication) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Product not found"));
+
+        User seller = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "User not found"));
+
+        if (!product.getSeller().getId().equals(seller.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not allowed to update this product");
+        }
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Category not found"));
+
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setSku(request.getSku());
+        product.setImageUrl(request.getImageUrl());
+        product.setCategory(category);
+
+        return productRepository.save(product);
+    }
+
+    public void deleteProduct(
+            Long productId,
+            Authentication authentication) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Product not found"));
+
+        User seller = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "User not found"));
+
+        if (!product.getSeller().getId().equals(seller.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not allowed to delete this product");
+        }
+
+        productRepository.delete(product);
+    }
+
+    public ProductResponse convertToResponse(Product product) {
 
         CategoryResponse category = new CategoryResponse(
                 product.getCategory().getId(),
