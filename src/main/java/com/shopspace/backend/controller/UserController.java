@@ -2,7 +2,6 @@ package com.shopspace.backend.controller;
 
 import com.shopspace.backend.dto.RegisterRequest;
 import com.shopspace.backend.dto.UserResponse;
-import com.shopspace.backend.entity.User;
 import com.shopspace.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,20 +20,25 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(
-        @RequestBody RegisterRequest request) {
+            @RequestBody RegisterRequest request) {
 
-    UserResponse response = userService.register(request);
+        UserResponse response = userService.register(request);
 
-    return ResponseEntity.ok(response);
-}
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+
+        return ResponseEntity.ok(
+                userService.getAllUsers()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUserById(
+            @PathVariable Long id) {
+
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

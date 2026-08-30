@@ -42,26 +42,37 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        return new UserResponse(
-                savedUser.getId(),
-                savedUser.getFirstName(),
-                savedUser.getLastName(),
-                savedUser.getEmail(),
-                savedUser.getPhone(),
-                savedUser.getRole(),
-                savedUser.isEnabled()
-        );
+        return convertToResponse(savedUser);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponse> getAllUsers() {
+
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
     }
 
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public Optional<UserResponse> getUserById(Long id) {
+
+        return userRepository.findById(id)
+                .map(this::convertToResponse);
     }
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    private UserResponse convertToResponse(User user) {
+
+        return new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole(),
+                user.isEnabled()
+        );
     }
 }
