@@ -36,5 +36,9 @@ build/
 application-local.properties
 *.log
 
+# Frontend dependencies and build output
+frontend/node_modules/
+frontend/dist/
+
 # Local development utilities
 PasswordGenerator.java

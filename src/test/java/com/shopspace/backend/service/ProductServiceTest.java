@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -85,6 +86,23 @@ class ProductServiceTest {
         verify(productRepository, never()).save(product);
     }
 
+    @Test
+    void getProductsForSellerUsesAuthenticatedSellerEmail() {
+        User seller = seller(1L, "seller@shopspace.com");
+        Product ownedProduct = product(5L, seller);
+        ownedProduct.setName("Seller product");
+        ownedProduct.setCategory(category(1L));
+
+        when(productRepository.findBySellerEmail("seller@shopspace.com"))
+                .thenReturn(List.of(ownedProduct));
+
+        assertEquals(1, productService.getProductsForSeller(
+                new UsernamePasswordAuthenticationToken(
+                        "seller@shopspace.com", null)).size());
+
+        verify(productRepository).findBySellerEmail("seller@shopspace.com");
+    }
+
     private Product product(Long id, User seller) {
         Product product = new Product();
         product.setId(id);
@@ -96,12 +114,17 @@ class ProductServiceTest {
         User seller = new User();
         seller.setId(id);
         seller.setEmail(email);
+        seller.setFirstName("Test");
+        seller.setLastName("Seller");
         return seller;
     }
 
     private Category category(Long id) {
         Category category = new Category();
         category.setId(id);
+        category.setName("Test category");
+        category.setDescription("Test description");
+        category.setActive(true);
         return category;
     }
 

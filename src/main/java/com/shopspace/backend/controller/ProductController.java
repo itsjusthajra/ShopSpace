@@ -39,6 +39,13 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<List<ProductResponse>> getMyProducts(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(productService.getProductsForSeller(authentication));
+    }
+
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(
             @Valid @RequestBody CreateProductRequest request,

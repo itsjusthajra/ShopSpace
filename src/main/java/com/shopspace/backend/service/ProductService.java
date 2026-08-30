@@ -50,6 +50,14 @@ public class ProductService {
                 .map(this::convertToResponse);
     }
 
+    public List<ProductResponse> getProductsForSeller(Authentication authentication) {
+
+        return productRepository.findBySellerEmail(authentication.getName())
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
+    }
+
     public ProductResponse createProduct(
             CreateProductRequest request,
             Authentication authentication) {
