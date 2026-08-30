@@ -11,6 +11,7 @@ import com.shopspace.backend.repository.CategoryRepository;
 import com.shopspace.backend.repository.ProductRepository;
 import com.shopspace.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,13 +47,15 @@ public class ProductService {
                 .map(this::convertToResponse);
     }
 
-    public ProductResponse createProduct(CreateProductRequest request) {
+    public ProductResponse createProduct(
+            CreateProductRequest request,
+            Authentication authentication) {
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        User seller = userRepository.findById(request.getSellerId())
-                .orElseThrow(() -> new RuntimeException("Seller not found"));
+        User seller = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Product product = new Product();
 

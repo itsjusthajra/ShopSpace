@@ -10,7 +10,6 @@ public class CreateProductRequest {
     private String sku;
     private String imageUrl;
     private Long categoryId;
-    private Long sellerId;
 
     public CreateProductRequest() {
     }
@@ -61,13 +60,5 @@ public class CreateProductRequest {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public Long getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(Long sellerId) {
-        this.sellerId = sellerId;
     }
 }
