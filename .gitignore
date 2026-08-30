@@ -35,3 +35,6 @@ build/
 .env
 application-local.properties
 *.log
+
+# Local development utilities
+PasswordGenerator.java

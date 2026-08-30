@@ -3,6 +3,8 @@ package com.shopspace.backend.controller;
 import com.shopspace.backend.dto.CreateProductRequest;
 import com.shopspace.backend.dto.ProductResponse;
 
+import org.springframework.security.core.Authentication;
+
 import com.shopspace.backend.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +39,10 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(
-            @RequestBody CreateProductRequest request) {
+            @RequestBody CreateProductRequest request,
+            Authentication authentication) {
 
         return ResponseEntity.ok(
-                productService.createProduct(request));
+                productService.createProduct(request, authentication));
     }
 }
